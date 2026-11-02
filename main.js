@@ -57,107 +57,50 @@ const carousel = document.querySelector('.hero-carousel');
 if (carousel) {
   const slides = Array.from(carousel.querySelectorAll('.hero-copy'));
   const backgrounds = Array.from(document.querySelectorAll('.hero-slide'));
-  const dots = Array.from(carousel.querySelectorAll('[data-carousel-slide]'));
-  const pauseButton = carousel.querySelector('[data-carousel-pause]');
   let activeSlide = 0;
   let timer;
-  let userPaused = prefersReducedMotion;
-  let interactionPaused = false;
+  let focusPaused = false;
 
-  function showSlide(index, direction = 1) {
+  function showSlide(index) {
     const previousSlide = activeSlide;
     activeSlide = (index + slides.length) % slides.length;
     slides.forEach(function (slide, slideIndex) {
       const isActive = slideIndex === activeSlide;
       const isPrevious = slideIndex === previousSlide && !isActive;
       slide.classList.toggle('is-active', isActive);
-      slide.classList.toggle('is-before', isPrevious ? direction > 0 : !isActive && direction < 0);
+      slide.classList.toggle('is-before', isPrevious);
       slide.setAttribute('aria-hidden', String(!isActive));
+      slide.inert = !isActive;
     });
     backgrounds.forEach(function (background, slideIndex) {
       const isActive = slideIndex === activeSlide;
       const isPrevious = slideIndex === previousSlide && !isActive;
       background.classList.toggle('is-active', isActive);
-      background.classList.toggle('is-before', isPrevious ? direction > 0 : !isActive && direction < 0);
-    });
-    dots.forEach(function (dot, slideIndex) {
-      const isActive = slideIndex === activeSlide;
-      dot.classList.toggle('is-active', isActive);
-      if (isActive) {
-        dot.setAttribute('aria-current', 'true');
-      } else {
-        dot.removeAttribute('aria-current');
-      }
+      background.classList.toggle('is-before', isPrevious);
     });
   }
 
   function syncTimer() {
     window.clearInterval(timer);
-    if (!userPaused && !interactionPaused && !document.hidden) {
+    if (!prefersReducedMotion && !focusPaused && !document.hidden) {
       timer = window.setInterval(function () {
         showSlide(activeSlide + 1);
       }, 4500);
     }
-    if (pauseButton) {
-      const paused = userPaused;
-      pauseButton.setAttribute('aria-label', paused ? 'Start slide rotation' : 'Pause slide rotation');
-      pauseButton.innerHTML = paused
-        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg>'
-        : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM15 5h3v14h-3z"/></svg>';
-    }
   }
 
-  carousel.querySelector('[data-carousel-prev]')?.addEventListener('click', function () {
-    showSlide(activeSlide - 1, -1);
-    syncTimer();
-  });
-  carousel.querySelector('[data-carousel-next]')?.addEventListener('click', function () {
-    showSlide(activeSlide + 1);
-    syncTimer();
-  });
-  dots.forEach(function (dot) {
-    dot.addEventListener('click', function () {
-      const targetSlide = Number(dot.dataset.carouselSlide);
-      const forwardDistance = (targetSlide - activeSlide + slides.length) % slides.length;
-      const direction = forwardDistance <= slides.length / 2 ? 1 : -1;
-      showSlide(targetSlide, direction);
-      syncTimer();
-    });
-  });
-  pauseButton?.addEventListener('click', function () {
-    userPaused = !userPaused;
-    syncTimer();
-  });
-  carousel.addEventListener('pointerenter', function () {
-    interactionPaused = true;
-    syncTimer();
-  });
-  carousel.addEventListener('pointerleave', function () {
-    interactionPaused = carousel.contains(document.activeElement);
-    syncTimer();
-  });
   carousel.addEventListener('focusin', function () {
-    userPaused = true;
-    interactionPaused = true;
+    focusPaused = true;
     syncTimer();
   });
   carousel.addEventListener('focusout', function (event) {
     if (!carousel.contains(event.relatedTarget)) {
-      interactionPaused = carousel.matches(':hover');
-      syncTimer();
-    }
-  });
-  carousel.addEventListener('keydown', function (event) {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      event.preventDefault();
-      const direction = event.key === 'ArrowRight' ? 1 : -1;
-      showSlide(activeSlide + direction, direction);
+      focusPaused = false;
       syncTimer();
     }
   });
   document.addEventListener('visibilitychange', syncTimer);
   showSlide(0);
-  document.body.classList.add('carousel-ready');
   syncTimer();
 }
 
