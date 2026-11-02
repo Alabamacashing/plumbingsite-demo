@@ -109,10 +109,10 @@ nav a:not(.nav-cta):hover::after{transform:scaleX(1)}
   display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;
 }
 .hero-content{min-width:0}
-.hero-carousel{position:relative;max-width:670px;min-height:410px;display:flex;flex-direction:column;justify-content:center;touch-action:pan-y}
-.hero-copy{position:absolute;inset:0 auto auto 0;width:100%;opacity:0;visibility:hidden;pointer-events:none;transform:translate3d(100%,0,0);transition:transform .65s cubic-bezier(.2,.7,.2,1),opacity .4s ease;will-change:transform,opacity}
+.hero-carousel{position:relative;max-width:670px;min-height:410px;display:grid;align-items:center;touch-action:pan-y}
+.hero-copy{grid-area:1 / 1;align-self:center;width:100%;opacity:0;visibility:hidden;pointer-events:none;transform:translate3d(100%,0,0);transition:transform .65s cubic-bezier(.2,.7,.2,1),opacity .4s ease;will-change:transform,opacity}
 .hero-copy.is-before{transform:translateX(-100%)}
-.hero-copy.is-active{position:relative;opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0)}
+.hero-copy.is-active{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0)}
 .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.2rem,7vw,5.5rem);line-height:.95;color:var(--white);margin-bottom:24px;letter-spacing:.02em}
 .hero-title em{color:var(--amber);font-style:normal;display:block}
 .hero-badge{
