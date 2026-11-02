@@ -40,6 +40,105 @@ if (!prefersReducedMotion && 'IntersectionObserver' in window) {
   document.body.classList.add('motion-ready');
 }
 
+// ── HERO CAROUSEL ──
+const carousel = document.querySelector('.hero-carousel');
+if (carousel) {
+  const slides = Array.from(carousel.querySelectorAll('.hero-copy'));
+  const backgrounds = Array.from(document.querySelectorAll('.hero-slide'));
+  const dots = Array.from(carousel.querySelectorAll('[data-carousel-slide]'));
+  const pauseButton = carousel.querySelector('[data-carousel-pause]');
+  let activeSlide = 0;
+  let timer;
+  let userPaused = prefersReducedMotion;
+  let interactionPaused = false;
+
+  function showSlide(index) {
+    activeSlide = (index + slides.length) % slides.length;
+    slides.forEach(function (slide, slideIndex) {
+      const isActive = slideIndex === activeSlide;
+      slide.classList.toggle('is-active', isActive);
+      slide.setAttribute('aria-hidden', String(!isActive));
+    });
+    backgrounds.forEach(function (background, slideIndex) {
+      background.classList.toggle('is-active', slideIndex === activeSlide);
+    });
+    dots.forEach(function (dot, slideIndex) {
+      const isActive = slideIndex === activeSlide;
+      dot.classList.toggle('is-active', isActive);
+      if (isActive) {
+        dot.setAttribute('aria-current', 'true');
+      } else {
+        dot.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  function syncTimer() {
+    window.clearInterval(timer);
+    if (!userPaused && !interactionPaused && !document.hidden) {
+      timer = window.setInterval(function () {
+        showSlide(activeSlide + 1);
+      }, 6500);
+    }
+    if (pauseButton) {
+      const paused = userPaused;
+      pauseButton.setAttribute('aria-label', paused ? 'Start slide rotation' : 'Pause slide rotation');
+      pauseButton.innerHTML = paused
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM15 5h3v14h-3z"/></svg>';
+    }
+  }
+
+  carousel.querySelector('[data-carousel-prev]')?.addEventListener('click', function () {
+    showSlide(activeSlide - 1);
+    syncTimer();
+  });
+  carousel.querySelector('[data-carousel-next]')?.addEventListener('click', function () {
+    showSlide(activeSlide + 1);
+    syncTimer();
+  });
+  dots.forEach(function (dot) {
+    dot.addEventListener('click', function () {
+      showSlide(Number(dot.dataset.carouselSlide));
+      syncTimer();
+    });
+  });
+  pauseButton?.addEventListener('click', function () {
+    userPaused = !userPaused;
+    syncTimer();
+  });
+  carousel.addEventListener('pointerenter', function () {
+    interactionPaused = true;
+    syncTimer();
+  });
+  carousel.addEventListener('pointerleave', function () {
+    interactionPaused = carousel.contains(document.activeElement);
+    syncTimer();
+  });
+  carousel.addEventListener('focusin', function () {
+    userPaused = true;
+    interactionPaused = true;
+    syncTimer();
+  });
+  carousel.addEventListener('focusout', function (event) {
+    if (!carousel.contains(event.relatedTarget)) {
+      interactionPaused = carousel.matches(':hover');
+      syncTimer();
+    }
+  });
+  carousel.addEventListener('keydown', function (event) {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      showSlide(activeSlide + (event.key === 'ArrowRight' ? 1 : -1));
+      syncTimer();
+    }
+  });
+  document.addEventListener('visibilitychange', syncTimer);
+  showSlide(0);
+  document.body.classList.add('carousel-ready');
+  syncTimer();
+}
+
 // ── CONTACT FORM SUBMIT ──
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
