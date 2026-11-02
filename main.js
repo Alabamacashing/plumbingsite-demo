@@ -19,7 +19,7 @@ document.addEventListener('click', function (e) {
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!prefersReducedMotion && 'IntersectionObserver' in window) {
   const revealTargets = document.querySelectorAll(
-    '.trust-item, .section-head, .service-card, .stats-row, .two-col, .why-card, .testi-card, .contact-info, .contact-form, .footer-grid > *'
+    '.trust-item, .section-head, .service-card, .stats-row, .two-col > .col-text, .two-col > .col-img, .why-card, .testi-card, .contact-info, .contact-form, .footer-grid > *, .emergency > *'
   );
   const revealObserver = new IntersectionObserver(function (entries, observer) {
     entries.forEach(function (entry) {
@@ -33,7 +33,19 @@ if (!prefersReducedMotion && 'IntersectionObserver' in window) {
   revealTargets.forEach(function (element) {
     const siblings = Array.from(element.parentElement.children);
     const siblingIndex = siblings.indexOf(element);
-    element.style.setProperty('--reveal-delay', `${(siblingIndex % 4) * 90}ms`);
+    const column = element.closest('.two-col');
+    let direction = siblingIndex % 2 === 0 ? 'left' : 'right';
+
+    if (column && (element.matches('.col-text') || element.matches('.col-img'))) {
+      const textComesFirst = !column.classList.contains('reverse');
+      const textColumn = element.matches('.col-text');
+      direction = textColumn === textComesFirst ? 'left' : 'right';
+    } else if (element.matches('.section-head')) {
+      direction = 'up';
+    }
+
+    element.style.setProperty('--reveal-delay', `${(siblingIndex % 4) * 70}ms`);
+    element.classList.add(`reveal-from-${direction}`);
     element.classList.add('reveal');
     revealObserver.observe(element);
   });
@@ -84,7 +96,7 @@ if (carousel) {
     if (!userPaused && !interactionPaused && !document.hidden) {
       timer = window.setInterval(function () {
         showSlide(activeSlide + 1);
-      }, 6500);
+      }, 4500);
     }
     if (pauseButton) {
       const paused = userPaused;
