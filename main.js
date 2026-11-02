@@ -17,7 +17,7 @@ document.addEventListener('click', function (e) {
 
 // ── SCROLL REVEALS ──
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+if ('IntersectionObserver' in window) {
   const revealTargets = document.querySelectorAll(
     '.trust-item, .section-head, .service-card, .stats-row, .two-col > .col-text, .two-col > .col-img, .why-card, .testi-card, .contact-info, .contact-form, .footer-grid > *, .emergency > *'
   );

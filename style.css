@@ -346,7 +346,8 @@ footer{background:var(--navy);padding:52px 24px 24px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-  .motion-ready .reveal{opacity:1;transform:none}
+  .motion-ready .reveal{opacity:0;transform:none;transition:opacity .25s ease!important}
+  .motion-ready .reveal.is-visible{opacity:1;transform:none}
   .hero-slide,.hero-slide.is-before,.hero-slide.is-active{transform:none}
   .hero-copy,.hero-copy.is-before,.hero-copy.is-active{transform:none}
 }
