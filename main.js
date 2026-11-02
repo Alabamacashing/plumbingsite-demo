@@ -60,6 +60,8 @@ if (carousel) {
   let activeSlide = 0;
   let timer;
   let focusPaused = false;
+  let touchStart;
+  let suppressSwipeClick = false;
 
   function showSlide(index) {
     const previousSlide = activeSlide;
@@ -99,6 +101,37 @@ if (carousel) {
       syncTimer();
     }
   });
+  carousel.addEventListener('pointerdown', function (event) {
+    if (event.pointerType === 'touch') {
+      touchStart = { x: event.clientX, y: event.clientY };
+    }
+  });
+  carousel.addEventListener('pointerup', function (event) {
+    if (event.pointerType !== 'touch' || !touchStart) return;
+
+    const deltaX = event.clientX - touchStart.x;
+    const deltaY = event.clientY - touchStart.y;
+    touchStart = undefined;
+
+    if (Math.abs(deltaX) < 48 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+
+    showSlide(activeSlide + (deltaX < 0 ? 1 : -1));
+    syncTimer();
+    suppressSwipeClick = true;
+    window.setTimeout(function () {
+      suppressSwipeClick = false;
+    }, 500);
+  });
+  carousel.addEventListener('pointercancel', function () {
+    touchStart = undefined;
+  });
+  carousel.addEventListener('click', function (event) {
+    if (suppressSwipeClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      suppressSwipeClick = false;
+    }
+  }, true);
   document.addEventListener('visibilitychange', syncTimer);
   showSlide(0);
   syncTimer();

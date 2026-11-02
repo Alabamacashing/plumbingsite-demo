@@ -101,7 +101,7 @@ nav a:not(.nav-cta):hover::after{transform:scaleX(1)}
 .hero-slides,.hero-slides::after{position:absolute;inset:0;pointer-events:none}
 .hero-slides{overflow:hidden;background:var(--navy)}
 .hero-slides::after{content:'';background:linear-gradient(90deg,rgba(10,22,40,.94) 0%,rgba(10,22,40,.8) 44%,rgba(10,22,40,.58) 100%)}
-.hero-slide{position:absolute;inset:0;background-image:var(--slide-image);background-position:center;background-size:cover;transform:translateX(100%) scale(1.04);transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.hero-slide{position:absolute;inset:0;background-image:var(--slide-image);background-position:center;background-size:cover;transform:translate3d(100%,0,0) scale(1.04);transition:transform .8s cubic-bezier(.2,.7,.2,1);will-change:transform}
 .hero-slide.is-before{transform:translateX(-100%) scale(1.04)}
 .hero-slide.is-active{transform:translateX(0) scale(1)}
 .hero-grid{
@@ -109,8 +109,8 @@ nav a:not(.nav-cta):hover::after{transform:scaleX(1)}
   display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;
 }
 .hero-content{min-width:0}
-.hero-carousel{position:relative;max-width:670px;min-height:410px;display:flex;flex-direction:column;justify-content:center}
-.hero-copy{position:absolute;inset:0 auto auto 0;width:100%;opacity:0;visibility:hidden;pointer-events:none;transform:translateX(100%);transition:transform .65s cubic-bezier(.2,.7,.2,1),opacity .4s ease}
+.hero-carousel{position:relative;max-width:670px;min-height:410px;display:flex;flex-direction:column;justify-content:center;touch-action:pan-y}
+.hero-copy{position:absolute;inset:0 auto auto 0;width:100%;opacity:0;visibility:hidden;pointer-events:none;transform:translate3d(100%,0,0);transition:transform .65s cubic-bezier(.2,.7,.2,1),opacity .4s ease;will-change:transform,opacity}
 .hero-copy.is-before{transform:translateX(-100%)}
 .hero-copy.is-active{position:relative;opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0)}
 .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.2rem,7vw,5.5rem);line-height:.95;color:var(--white);margin-bottom:24px;letter-spacing:.02em}
@@ -340,6 +340,7 @@ footer{background:var(--navy);padding:52px 24px 24px}
   .hero-btns{flex-direction:column}
   .btn-primary,.btn-outline{justify-content:center;text-align:center}
   .hero-carousel{min-height:440px}
+  .hero-slide{transition-duration:.65s}
   .hero-title,.hero h1{font-size:clamp(2.9rem,13vw,4.2rem)}
   .hero-controls{margin-top:24px}
 }
