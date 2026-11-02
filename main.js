@@ -52,15 +52,21 @@ if (carousel) {
   let userPaused = prefersReducedMotion;
   let interactionPaused = false;
 
-  function showSlide(index) {
+  function showSlide(index, direction = 1) {
+    const previousSlide = activeSlide;
     activeSlide = (index + slides.length) % slides.length;
     slides.forEach(function (slide, slideIndex) {
       const isActive = slideIndex === activeSlide;
+      const isPrevious = slideIndex === previousSlide && !isActive;
       slide.classList.toggle('is-active', isActive);
+      slide.classList.toggle('is-before', isPrevious ? direction > 0 : !isActive && direction < 0);
       slide.setAttribute('aria-hidden', String(!isActive));
     });
     backgrounds.forEach(function (background, slideIndex) {
-      background.classList.toggle('is-active', slideIndex === activeSlide);
+      const isActive = slideIndex === activeSlide;
+      const isPrevious = slideIndex === previousSlide && !isActive;
+      background.classList.toggle('is-active', isActive);
+      background.classList.toggle('is-before', isPrevious ? direction > 0 : !isActive && direction < 0);
     });
     dots.forEach(function (dot, slideIndex) {
       const isActive = slideIndex === activeSlide;
@@ -90,7 +96,7 @@ if (carousel) {
   }
 
   carousel.querySelector('[data-carousel-prev]')?.addEventListener('click', function () {
-    showSlide(activeSlide - 1);
+    showSlide(activeSlide - 1, -1);
     syncTimer();
   });
   carousel.querySelector('[data-carousel-next]')?.addEventListener('click', function () {
@@ -99,7 +105,10 @@ if (carousel) {
   });
   dots.forEach(function (dot) {
     dot.addEventListener('click', function () {
-      showSlide(Number(dot.dataset.carouselSlide));
+      const targetSlide = Number(dot.dataset.carouselSlide);
+      const forwardDistance = (targetSlide - activeSlide + slides.length) % slides.length;
+      const direction = forwardDistance <= slides.length / 2 ? 1 : -1;
+      showSlide(targetSlide, direction);
       syncTimer();
     });
   });
@@ -129,7 +138,8 @@ if (carousel) {
   carousel.addEventListener('keydown', function (event) {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      showSlide(activeSlide + (event.key === 'ArrowRight' ? 1 : -1));
+      const direction = event.key === 'ArrowRight' ? 1 : -1;
+      showSlide(activeSlide + direction, direction);
       syncTimer();
     }
   });
